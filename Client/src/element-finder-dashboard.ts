@@ -247,7 +247,7 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
       min-height: var(--uui-size-6);
       padding: var(--uui-size-space-1) var(--uui-size-space-2);
       border-radius: 999px;
-      background: #eaeaea;
+      background: var(--uui-color-surface-emphasis);
       color: var(--uui-color-text);
       font-weight: 700;
     }
@@ -259,7 +259,7 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
     }
 
     .pagination-wrapper uui-pagination {
-      display: block;
+      display: inline-flex;
       width: 100%;
     }
 

@@ -486,7 +486,7 @@ o(c, "properties", {
     }
 
     .pagination-wrapper uui-pagination {
-      display: block;
+      display: inline-flex;
       width: 100%;
     }
 
