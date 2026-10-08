@@ -1,17 +1,18 @@
 var m = Object.defineProperty;
 var _ = (r, e, t) => e in r ? m(r, e, { enumerable: !0, configurable: !0, writable: !0, value: t }) : r[e] = t;
 var o = (r, e, t) => _(r, typeof e != "symbol" ? e + "" : e, t);
-import { LitElement as b, css as y, html as a } from "@umbraco-cms/backoffice/external/lit";
-import { UmbElementMixin as T } from "@umbraco-cms/backoffice/element-api";
-import { UmbModalRouteRegistrationController as f } from "@umbraco-cms/backoffice/router";
-import { UMB_WORKSPACE_MODAL as v } from "@umbraco-cms/backoffice/workspace";
-import { UMB_DOCUMENT_ENTITY_TYPE as w, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN as P } from "@umbraco-cms/backoffice/document";
-const d = "/umbraco/backoffice/elementfinder", g = 20;
-class c extends T(b) {
+import { LitElement as b, css as y, html as i } from "@umbraco-cms/backoffice/external/lit";
+import { UmbElementMixin as f } from "@umbraco-cms/backoffice/element-api";
+import { UmbTextStyles as T } from "@umbraco-cms/backoffice/style";
+import { UmbModalRouteRegistrationController as v } from "@umbraco-cms/backoffice/router";
+import { UMB_WORKSPACE_MODAL as w } from "@umbraco-cms/backoffice/workspace";
+import { UMB_DOCUMENT_ENTITY_TYPE as x, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN as P } from "@umbraco-cms/backoffice/document";
+const h = "/umbraco/backoffice/elementfinder", g = 20;
+class c extends f(b) {
   constructor() {
-    super(), this._view = "list", this._elementTypes = [], this._elementTypeSearchText = "", this._elementTypeFilter = "", this._elementTypePage = 1, this._elementTypeTotalPages = 1, this._selectedElementType = null, this._pages = [], this._pageSearchText = "", this._pageFilter = "", this._pagePage = 1, this._pageTotalPages = 1, this._loading = !1, this._error = null, this._elementTypeRequestId = 0, this._pageRequestId = 0, this._workspaceModalRoute = new f(this, v).onSetup(async () => ({
+    super(), this._view = "list", this._elementTypes = [], this._elementTypeSearchText = "", this._elementTypeFilter = "", this._elementTypePage = 1, this._elementTypeTotalPages = 1, this._selectedElementType = null, this._pages = [], this._pageSearchText = "", this._pageFilter = "", this._pagePage = 1, this._pageTotalPages = 1, this._loading = !1, this._error = null, this._elementTypeRequestId = 0, this._pageRequestId = 0, this._workspaceModalRoute = new v(this, w).onSetup(async () => ({
       data: {
-        entityType: w,
+        entityType: x,
         preset: {}
       }
     })).onSubmit(() => {
@@ -28,7 +29,7 @@ class c extends T(b) {
     super.connectedCallback(), this._loadElementTypes(1, "");
   }
   async _loadElementTypes(e = 1, t = this._elementTypeFilter) {
-    const i = ++this._elementTypeRequestId;
+    const a = ++this._elementTypeRequestId;
     this._loading = !0, this._error = null;
     try {
       const s = new URLSearchParams({
@@ -36,15 +37,15 @@ class c extends T(b) {
         pageSize: String(g)
       });
       t && s.set("search", t);
-      const l = await fetch(`${d}/elementtypes?${s.toString()}`);
+      const l = await fetch(`${h}/elementtypes?${s.toString()}`);
       if (!l.ok) throw new Error(`Request failed (${l.status})`);
       const u = await l.json();
-      if (i !== this._elementTypeRequestId) return;
+      if (a !== this._elementTypeRequestId) return;
       this._elementTypes = u.items ?? [], this._elementTypePage = u.page ?? e, this._elementTypeTotalPages = u.totalPages ?? 1;
     } catch (s) {
-      i === this._elementTypeRequestId && (this._error = `Could not load Element Types: ${s}`);
+      a === this._elementTypeRequestId && (this._error = `Could not load Element Types: ${s}`);
     } finally {
-      i === this._elementTypeRequestId && (this._loading = !1);
+      a === this._elementTypeRequestId && (this._loading = !1);
     }
   }
   async _openElementType(e) {
@@ -53,7 +54,7 @@ class c extends T(b) {
   async _loadPages(e = 1, t = this._pageFilter) {
     var s;
     if (!((s = this._selectedElementType) != null && s.alias)) return;
-    const i = ++this._pageRequestId;
+    const a = ++this._pageRequestId;
     this._loading = !0, this._error = null;
     try {
       const l = new URLSearchParams({
@@ -62,15 +63,15 @@ class c extends T(b) {
         pageSize: String(g)
       });
       t && l.set("search", t);
-      const u = await fetch(`${d}/pagesforelementtype?${l.toString()}`);
+      const u = await fetch(`${h}/pagesforelementtype?${l.toString()}`);
       if (!u.ok) throw new Error(`Request failed (${u.status})`);
       const n = await u.json();
-      if (i !== this._pageRequestId) return;
+      if (a !== this._pageRequestId) return;
       this._pages = n.items ?? [], this._pagePage = n.page ?? e, this._pageTotalPages = n.totalPages ?? 1;
     } catch (l) {
-      i === this._pageRequestId && (this._error = `Could not load pages for ${this._selectedElementType.name}: ${l}`);
+      a === this._pageRequestId && (this._error = `Could not load pages for ${this._selectedElementType.name}: ${l}`);
     } finally {
-      i === this._pageRequestId && (this._loading = !1);
+      a === this._pageRequestId && (this._loading = !1);
     }
   }
   _back() {
@@ -78,11 +79,11 @@ class c extends T(b) {
   }
   _getPageWorkspaceHref(e) {
     if (!(e != null && e.key) || !this._workspaceModalPathBuilder) return;
-    const t = this._workspaceModalPathBuilder({}), i = P.generateLocal({
+    const t = this._workspaceModalPathBuilder({}), a = P.generateLocal({
       unique: e.key
     });
-    if (!(!t || !i))
-      return `${t}${i}`;
+    if (!(!t || !a))
+      return `${t}${a}`;
   }
   _submitElementTypeSearch() {
     this._elementTypeFilter = this._elementTypeSearchText.trim(), this._elementTypePage = 1, this._loadElementTypes(1, this._elementTypeFilter);
@@ -111,16 +112,16 @@ class c extends T(b) {
   _getIconName(e) {
     return e && e.trim().split(/\s+/)[0] || "icon-document";
   }
-  _renderPagination(e, t, i, s) {
-    return t <= 1 ? "" : a`
+  _renderPagination(e, t, a, s) {
+    return t <= 1 ? "" : i`
       <div class="pagination-wrapper">
         <uui-pagination
-          label=${i}
+          label=${a}
           .total=${t}
           .current=${e}
           @change=${(l) => {
-      var p, h;
-      const n = Number(((p = l.detail) == null ? void 0 : p.current) ?? ((h = l.target) == null ? void 0 : h.current));
+      var p, d;
+      const n = Number(((p = l.detail) == null ? void 0 : p.current) ?? ((d = l.target) == null ? void 0 : d.current));
       Number.isFinite(n) && n !== e && s(n);
     }}
         ></uui-pagination>
@@ -128,15 +129,15 @@ class c extends T(b) {
     `;
   }
   render() {
-    return a`
-      ${this._error ? a`<uui-box headline="Error">
+    return i`
+      ${this._error ? i`<uui-box headline="Error">
             <p>${this._error}</p>
           </uui-box>` : ""}
       ${this._view === "list" ? this._renderElementTypeList() : this._renderPageList()}
     `;
   }
   _renderElementTypeList() {
-    return a`
+    return i`
       <uui-box>
         <div slot="headline" class="element-finder-title">Element Finder — Element Types</div>
 
@@ -158,21 +159,21 @@ class c extends T(b) {
             label="Search"
             look="primary"
             @click=${this._submitElementTypeSearch}
-          ></uui-button>
+          >Search</uui-button>
         </div>
 
-        ${this._loading ? a`<div class="loader-container"><uui-loader></uui-loader></div>` : a`
-              ${this._elementTypes.length > 0 ? a`
+        ${this._loading ? i`<div class="loader-container"><uui-loader></uui-loader></div>` : i`
+              ${this._elementTypes.length > 0 ? i`
                     <uui-table>
                       <uui-table-head>
-                        <uui-table-head-cell>Name</uui-table-head-cell>
-                        <uui-table-head-cell>Alias</uui-table-head-cell>
-                        <uui-table-head-cell>Total Usage Count</uui-table-head-cell>
-                        <uui-table-head-cell>Action</uui-table-head-cell>
+                        <uui-table-head-cell><span>Name</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Alias</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Total Usage Count</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Action</span></uui-table-head-cell>
                       </uui-table-head>
 
                       ${this._elementTypes.map(
-      (e) => a`
+      (e) => i`
                           <uui-table-row>
                             <uui-table-cell>
                               <div class="element-type-name">
@@ -189,13 +190,13 @@ class c extends T(b) {
                                 label="View Usage"
                                 look="primary"
                                 @click=${() => this._openElementType(e)}
-                              ></uui-button>
+                              >View Usage</uui-button>
                             </uui-table-cell>
                           </uui-table-row>
                         `
     )}
                     </uui-table>
-                  ` : a`
+                  ` : i`
                     <p>
                       ${this._elementTypeFilter ? `No Element Types match "${this._elementTypeFilter}".` : "No Element Types found."}
                     </p>
@@ -214,7 +215,7 @@ class c extends T(b) {
   _renderPageList() {
     var t;
     const e = ((t = this._selectedElementType) == null ? void 0 : t.name) ?? "Element Type";
-    return a`
+    return i`
       <uui-box>
         <div slot="headline">
           <div class="detail-breadcrumbs">
@@ -247,45 +248,45 @@ class c extends T(b) {
               placeholder="Search pages…"
               .value=${this._pageSearchText}
               @input=${this._onPageSearchInput}
-              @keydown=${(i) => this._onSearchKeydown(i, this._submitPageSearch)}
+              @keydown=${(a) => this._onSearchKeydown(a, this._submitPageSearch)}
             ></uui-input>
             <uui-button
               type="button"
               label="Search"
               look="primary"
               @click=${this._submitPageSearch}
-            ></uui-button>
+            >Search</uui-button>
           </div>
         </div>
 
-        ${this._loading ? a`<div class="loader-container"><uui-loader></uui-loader></div>` : a`
-              ${this._pages.length > 0 ? a`
+        ${this._loading ? i`<div class="loader-container"><uui-loader></uui-loader></div>` : i`
+              ${this._pages.length > 0 ? i`
                     <uui-table>
                       <uui-table-head>
-                        <uui-table-head-cell>Name</uui-table-head-cell>
-                        <uui-table-head-cell>Status</uui-table-head-cell>
-                        <uui-table-head-cell>Usage Count</uui-table-head-cell>
-                        <uui-table-head-cell>Action</uui-table-head-cell>
+                        <uui-table-head-cell><span>Name</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Status</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Usage Count</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Action</span></uui-table-head-cell>
                       </uui-table-head>
 
                       ${this._pages.map(
-      (i) => a`
+      (a) => i`
                           <uui-table-row>
                             <uui-table-cell>
                               <div class="element-type-name">
-                                <uui-icon name=${this._getIconName(i.icon)}></uui-icon>
-                                <span>${i.name}</span>
+                                <uui-icon name=${this._getIconName(a.icon)}></uui-icon>
+                                <span>${a.name}</span>
                               </div>
                             </uui-table-cell>
                             <uui-table-cell>
-                              <uui-tag color=${i.published ? "positive" : "default"}>
-                                ${i.published ? "Published" : "Unpublished"}
+                              <uui-tag color=${a.published ? "positive" : "default"}>
+                                ${a.published ? "Published" : "Unpublished"}
                               </uui-tag>
                             </uui-table-cell>
                             <uui-table-cell>
                               <div class="usage-count-tags">
-                                ${Object.entries(i.usageCountsByCulture ?? {}).map(
-        ([s, l]) => a`
+                                ${Object.entries(a.usageCountsByCulture ?? {}).map(
+        ([s, l]) => i`
                                     <uui-tag look="outline">
                                       <span class="usage-count-tag-content">
                                         <span class="usage-count-culture">${s}</span>
@@ -300,17 +301,17 @@ class c extends T(b) {
                               <uui-button
                                 label="Go to Page"
                                 look="primary"
-                                .href=${this._getPageWorkspaceHref(i)}
+                                .href=${this._getPageWorkspaceHref(a)}
                                 @click=${(s) => {
-        this._getPageWorkspaceHref(i) || s.preventDefault();
+        this._getPageWorkspaceHref(a) || s.preventDefault();
       }}
-                              ></uui-button>
+                              >Go to Page</uui-button>
                             </uui-table-cell>
                           </uui-table-row>
                         `
     )}
                     </uui-table>
-                  ` : a`
+                  ` : i`
                     <p>
                       ${this._pageFilter ? `No pages match "${this._pageFilter}".` : `No pages where "${e}" is used were found.`}
                     </p>
@@ -322,7 +323,7 @@ class c extends T(b) {
       this._pagePage,
       this._pageTotalPages,
       "Used pages",
-      (i) => this._loadPages(i, this._pageFilter)
+      (a) => this._loadPages(a, this._pageFilter)
     )}
     `;
   }
@@ -342,18 +343,54 @@ o(c, "properties", {
   _pageTotalPages: { state: !0 },
   _loading: { state: !0 },
   _error: { state: !0 }
-}), o(c, "styles", y`
-    :host {
-      display: block;
-      box-sizing: border-box;
-      padding: var(--uui-size-layout-1);
-    }
+}), o(c, "styles", [
+  T,
+  y`
+      :host {
+        display: block;
+        box-sizing: border-box;
+        padding: var(--uui-size-layout-1);
+        color: var(--uui-color-text);
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif);
+        font-size: var(--uui-type-default-size, 14px);
+      }
 
-    .element-finder-title,
-    .detail-breadcrumbs,
-    .detail-breadcrumbs uui-breadcrumb-item {
-      font-size: 14px !important;
-    }
+      uui-button {
+        font-size: var(--uui-type-default-size, 14px);
+        --uui-button-font-size: var(--uui-type-default-size, 14px);
+        font-family: inherit;
+      }
+
+      uui-table-head {
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        background-color: var(--uui-color-surface);
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell {
+        --uui-table-cell-padding: 10px 20px;
+        font-weight: 600 !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        color: var(--uui-color-text) !important;
+        box-sizing: border-box;
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell,
+      uui-table-head-cell span {
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif) !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        line-height: inherit;
+      }
+
+      .element-finder-title,
+      .detail-breadcrumbs,
+      .detail-breadcrumbs uui-breadcrumb-item {
+        font-size: 14px !important;
+      }
 
     .breadcrumb-back-icon {
       vertical-align: middle;
@@ -512,5 +549,6 @@ o(c, "properties", {
         max-width: none;
       }
     }
-  `);
+  `
+]);
 customElements.define("element-finder-dashboard", c);

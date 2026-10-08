@@ -1,5 +1,6 @@
 import { LitElement, css, html } from "@umbraco-cms/backoffice/external/lit";
 import { UmbElementMixin } from "@umbraco-cms/backoffice/element-api";
+import { UmbTextStyles } from "@umbraco-cms/backoffice/style";
 import { UmbModalRouteRegistrationController } from "@umbraco-cms/backoffice/router";
 import { UMB_WORKSPACE_MODAL } from "@umbraco-cms/backoffice/workspace";
 import { UMB_DOCUMENT_ENTITY_TYPE, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN } from "@umbraco-cms/backoffice/document";
@@ -115,18 +116,54 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
     super.disconnectedCallback();
   }
 
-  static styles = css`
-    :host {
-      display: block;
-      box-sizing: border-box;
-      padding: var(--uui-size-layout-1);
-    }
+  static styles = [
+    UmbTextStyles,
+    css`
+      :host {
+        display: block;
+        box-sizing: border-box;
+        padding: var(--uui-size-layout-1);
+        color: var(--uui-color-text);
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif);
+        font-size: var(--uui-type-default-size, 14px);
+      }
 
-    .element-finder-title,
-    .detail-breadcrumbs,
-    .detail-breadcrumbs uui-breadcrumb-item {
-      font-size: 14px !important;
-    }
+      uui-button {
+        font-size: var(--uui-type-default-size, 14px);
+        --uui-button-font-size: var(--uui-type-default-size, 14px);
+        font-family: inherit;
+      }
+
+      uui-table-head {
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        background-color: var(--uui-color-surface);
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell {
+        --uui-table-cell-padding: 10px 20px;
+        font-weight: 600 !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        color: var(--uui-color-text) !important;
+        box-sizing: border-box;
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell,
+      uui-table-head-cell span {
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif) !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        line-height: inherit;
+      }
+
+      .element-finder-title,
+      .detail-breadcrumbs,
+      .detail-breadcrumbs uui-breadcrumb-item {
+        font-size: 14px !important;
+      }
 
     .breadcrumb-back-icon {
       vertical-align: middle;
@@ -247,7 +284,7 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
       min-height: var(--uui-size-6);
       padding: var(--uui-size-space-1) var(--uui-size-space-2);
       border-radius: 999px;
-      background: var(--uui-color-surface-emphasis);
+      background: #eaeaea;
       color: var(--uui-color-text);
       font-weight: 700;
     }
@@ -285,7 +322,8 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
         max-width: none;
       }
     }
-  `;
+  `,
+  ];
 
   connectedCallback() {
     super.connectedCallback();
@@ -495,7 +533,7 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
             label="Search"
             look="primary"
             @click=${this._submitElementTypeSearch}
-          ></uui-button>
+          >Search</uui-button>
         </div>
 
         ${this._loading
@@ -505,10 +543,10 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
                 ? html`
                     <uui-table>
                       <uui-table-head>
-                        <uui-table-head-cell>Name</uui-table-head-cell>
-                        <uui-table-head-cell>Alias</uui-table-head-cell>
-                        <uui-table-head-cell>Total Usage Count</uui-table-head-cell>
-                        <uui-table-head-cell>Action</uui-table-head-cell>
+                        <uui-table-head-cell><span>Name</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Alias</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Total Usage Count</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Action</span></uui-table-head-cell>
                       </uui-table-head>
 
                       ${this._elementTypes.map(
@@ -529,7 +567,7 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
                                 label="View Usage"
                                 look="primary"
                                 @click=${() => this._openElementType(elementType)}
-                              ></uui-button>
+                              >View Usage</uui-button>
                             </uui-table-cell>
                           </uui-table-row>
                         `
@@ -600,7 +638,7 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
               label="Search"
               look="primary"
               @click=${this._submitPageSearch}
-            ></uui-button>
+            >Search</uui-button>
           </div>
         </div>
 
@@ -611,10 +649,10 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
                 ? html`
                     <uui-table>
                       <uui-table-head>
-                        <uui-table-head-cell>Name</uui-table-head-cell>
-                        <uui-table-head-cell>Status</uui-table-head-cell>
-                        <uui-table-head-cell>Usage Count</uui-table-head-cell>
-                        <uui-table-head-cell>Action</uui-table-head-cell>
+                        <uui-table-head-cell><span>Name</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Status</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Usage Count</span></uui-table-head-cell>
+                        <uui-table-head-cell><span>Action</span></uui-table-head-cell>
                       </uui-table-head>
 
                       ${this._pages.map(
@@ -655,7 +693,7 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
                                     event.preventDefault();
                                   }
                                 }}
-                              ></uui-button>
+                              >Go to Page</uui-button>
                             </uui-table-cell>
                           </uui-table-row>
                         `

@@ -1,5 +1,6 @@
 import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import type { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { umbConfirmModal } from '@umbraco-cms/backoffice/modal';
@@ -366,7 +367,13 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
     try {
       await umbConfirmModal(this, {
         headline: `Delete ${count} item${count === 1 ? '' : 's'}`,
-        content: `Are you sure you want to delete the ${count} selected cleanup candidate${count === 1 ? '' : 's'}?${warning} This action cannot be undone.`,
+        content: html`
+          <p style="margin: 0 0 var(--uui-size-space-3, 12px);">Are you sure you want to delete the ${count} selected cleanup candidate${count === 1 ? '' : 's'}?</p>
+          ${hasUsage
+            ? html`<p style="margin: 0 0 var(--uui-size-space-3, 12px);">Warning: Some selected items have detected usages. Deleting them may impact existing content or configuration.</p>`
+            : nothing}
+          <p style="margin: 0;">This action cannot be undone.</p>
+        `,
         color: 'danger',
         confirmLabel: 'Delete',
       });
@@ -428,7 +435,13 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
     try {
       await umbConfirmModal(this, {
         headline: `Delete ${item.type}`,
-        content: `Are you sure you want to delete ${item.type.toLowerCase()} "${item.name}"?${warning} This action cannot be undone.`,
+        content: html`
+          <p style="margin: 0 0 var(--uui-size-space-3, 12px);">Are you sure you want to delete ${item.type.toLowerCase()} "${item.name}"?</p>
+          ${hasUsage
+            ? html`<p style="margin: 0 0 var(--uui-size-space-3, 12px);">Warning: This item has ${count} detected usage(s). Deleting it may impact existing content or configuration.</p>`
+            : nothing}
+          <p style="margin: 0;">This action cannot be undone.</p>
+        `,
         color: 'danger',
         confirmLabel: 'Delete',
       });
@@ -562,16 +575,24 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
 
     return html`
       <uui-table-head-cell aria-sort=${ariaSort} style="white-space: nowrap;">
-        <uui-button
-          compact
-          look="default"
-          label="Sort by ${label}"
-          @click=${() => this.#changeSort(column)}>
+        <div
+          class="head-cell-content"
+          role="button"
+          tabindex="0"
+          aria-label="Sort by ${label}"
+          @click=${() => this.#changeSort(column)}
+          @keydown=${(e: KeyboardEvent) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              this.#changeSort(column);
+            }
+          }}>
           <span>${label}</span>
-          ${active
-            ? html`<uui-icon name=${this._sortDirection === 'asc' ? 'icon-navigation-up' : 'icon-navigation-down'}></uui-icon>`
-            : nothing}
-        </uui-button>
+          <uui-symbol-sort
+            ?active=${active}
+            ?descending=${this._sortDirection === 'desc'}>
+          </uui-symbol-sort>
+        </div>
       </uui-table-head-cell>
     `;
   }
@@ -722,9 +743,9 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
                         ${this.#renderSortHeading('Type', 'type')}
                         ${this.#renderSortHeading('Usage Count', 'usage')}
                         ${this.#renderSortHeading('Risk', 'risk')}
-                        <uui-table-head-cell>Details</uui-table-head-cell>
-                        <uui-table-head-cell class="usage-head-cell">Usage</uui-table-head-cell>
-                        <uui-table-head-cell class="action-head-cell">Action</uui-table-head-cell>
+                        <uui-table-head-cell><span>Details</span></uui-table-head-cell>
+                        <uui-table-head-cell class="usage-head-cell"><span>Usage</span></uui-table-head-cell>
+                        <uui-table-head-cell class="action-head-cell"><span>Action</span></uui-table-head-cell>
                       </uui-table-head>
 
                       ${this._items.map((item) => html`
@@ -794,14 +815,66 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
     `;
   }
 
-  static styles = css`
-    :host {
-      display: block;
-      box-sizing: border-box;
-      padding: var(--uui-size-layout-1);
-    }
+  static styles = [
+    UmbTextStyles,
+    css`
+      :host {
+        display: block;
+        box-sizing: border-box;
+        padding: var(--uui-size-layout-1);
+        color: var(--uui-color-text);
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif);
+        font-size: var(--uui-type-default-size, 14px);
+      }
 
-    #main {
+      uui-button {
+        font-size: var(--uui-type-default-size, 14px);
+        --uui-button-font-size: var(--uui-type-default-size, 14px);
+        font-family: inherit;
+      }
+
+      uui-table-head {
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        background-color: var(--uui-color-surface);
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell {
+        --uui-table-cell-padding: 10px 20px;
+        font-weight: 600 !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        color: var(--uui-color-text) !important;
+        box-sizing: border-box;
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell,
+      uui-table-head-cell span,
+      uui-table-head-cell .head-cell-content {
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif) !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        line-height: inherit;
+      }
+
+      .head-cell-content {
+        display: inline-flex;
+        align-items: center;
+        gap: var(--uui-size-space-2);
+        cursor: pointer;
+        user-select: none;
+        outline: none;
+      }
+
+      .head-cell-content:hover,
+      uui-table-head-cell:hover,
+      uui-table-head-cell:focus-within {
+        --uui-symbol-sort-hover: 1;
+      }
+
+      #main {
       display: grid;
       gap: var(--uui-size-space-5);
     }
@@ -935,7 +1008,7 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
       min-height: var(--uui-size-6);
       padding: var(--uui-size-space-1) var(--uui-size-space-2);
       border-radius: 999px;
-      background: var(--uui-color-surface-emphasis);
+      background: #eaeaea;
       color: var(--uui-color-text);
       font-weight: 700;
     }
@@ -987,7 +1060,8 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
         flex-direction: column;
       }
     }
-  `;
+  `,
+  ];
 }
 
 customElements.define('umb-content-cleaner-dashboard', UmbContentCleanerDashboardElement);

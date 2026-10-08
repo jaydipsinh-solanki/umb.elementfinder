@@ -1,25 +1,26 @@
-var E = Object.defineProperty;
-var T = (s) => {
-  throw TypeError(s);
+var z = Object.defineProperty;
+var _ = (r) => {
+  throw TypeError(r);
 };
-var U = (s, n, e) => n in s ? E(s, n, { enumerable: !0, configurable: !0, writable: !0, value: e }) : s[n] = e;
-var d = (s, n, e) => U(s, typeof n != "symbol" ? n + "" : n, e), A = (s, n, e) => n.has(s) || T("Cannot " + e);
-var b = (s, n, e) => n.has(s) ? T("Cannot add the same private member more than once") : n instanceof WeakSet ? n.add(s) : n.set(s, e);
-var r = (s, n, e) => (A(s, n, "access private method"), e);
-import { html as c, nothing as h, css as B } from "@umbraco-cms/backoffice/external/lit";
-import { UmbLitElement as R } from "@umbraco-cms/backoffice/lit-element";
+var U = (r, o, e) => o in r ? z(r, o, { enumerable: !0, configurable: !0, writable: !0, value: e }) : r[o] = e;
+var d = (r, o, e) => U(r, typeof o != "symbol" ? o + "" : o, e), A = (r, o, e) => o.has(r) || _("Cannot " + e);
+var T = (r, o, e) => o.has(r) ? _("Cannot add the same private member more than once") : o instanceof WeakSet ? o.add(r) : o.set(r, e);
+var s = (r, o, e) => (A(r, o, "access private method"), e);
+import { html as c, nothing as h, css as E } from "@umbraco-cms/backoffice/external/lit";
+import { UmbLitElement as B } from "@umbraco-cms/backoffice/lit-element";
+import { UmbTextStyles as R } from "@umbraco-cms/backoffice/style";
 import { UMB_AUTH_CONTEXT as v } from "@umbraco-cms/backoffice/auth";
 import { UMB_MODAL_CONTEXT as P } from "@umbraco-cms/backoffice/modal";
-import { UmbModalRouteRegistrationController as z } from "@umbraco-cms/backoffice/router";
-import { UMB_WORKSPACE_MODAL as M } from "@umbraco-cms/backoffice/workspace";
-import { UMB_DOCUMENT_ENTITY_TYPE as N, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN as D } from "@umbraco-cms/backoffice/document";
-import { UMB_DOCUMENT_TYPE_ENTITY_TYPE as O, UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN as L } from "@umbraco-cms/backoffice/document-type";
-import { UMB_DATA_TYPE_ENTITY_TYPE as Y, UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN as j } from "@umbraco-cms/backoffice/data-type";
-var a, w, k, C, $, p, m, f, x;
-class y extends R {
+import { UmbModalRouteRegistrationController as M } from "@umbraco-cms/backoffice/router";
+import { UMB_WORKSPACE_MODAL as N } from "@umbraco-cms/backoffice/workspace";
+import { UMB_DOCUMENT_ENTITY_TYPE as D, UMB_EDIT_DOCUMENT_WORKSPACE_PATH_PATTERN as L } from "@umbraco-cms/backoffice/document";
+import { UMB_DOCUMENT_TYPE_ENTITY_TYPE as O, UMB_EDIT_DOCUMENT_TYPE_WORKSPACE_PATH_PATTERN as Y } from "@umbraco-cms/backoffice/document-type";
+import { UMB_DATA_TYPE_ENTITY_TYPE as H, UMB_EDIT_DATA_TYPE_WORKSPACE_PATH_PATTERN as S } from "@umbraco-cms/backoffice/data-type";
+var a, x, w, k, C, p, m, y, $;
+class f extends B {
   constructor() {
     super();
-    b(this, a);
+    T(this, a);
     d(this, "_workspaceContext");
     d(this, "_authContext");
     d(this, "_workspaceModalRoute");
@@ -27,12 +28,12 @@ class y extends R {
     this._candidate = void 0, this._loadingFallback = !1, this.consumeContext(v, (e) => {
       this._authContext = e ?? void 0;
     }), this.consumeContext(P, (e) => {
-      var o, l;
+      var n, l;
       const t = e;
       this._workspaceContext = t;
-      const i = (l = (o = t == null ? void 0 : t.data) == null ? void 0 : o.preset) == null ? void 0 : l.candidate;
-      i ? this._candidate = i : r(this, a, w).call(this);
-    }), this._workspaceModalRoute = new z(this, M).addAdditionalPath(":entityType").onSetup((e) => ({
+      const i = (l = (n = t == null ? void 0 : t.data) == null ? void 0 : n.preset) == null ? void 0 : l.candidate;
+      i ? this._candidate = i : s(this, a, x).call(this);
+    }), this._workspaceModalRoute = new M(this, N).addAdditionalPath(":entityType").onSetup((e) => ({
       data: {
         entityType: e.entityType,
         preset: {}
@@ -51,7 +52,7 @@ class y extends R {
       return c`<div class="loader"><uui-loader></uui-loader></div>`;
     const e = this._candidate;
     if (!e) return h;
-    const t = e.usages ?? [], i = t.filter((l) => r(this, a, p).call(this, l)), o = t.filter((l) => !r(this, a, p).call(this, l));
+    const t = e.usages ?? [], i = t.filter((l) => s(this, a, p).call(this, l)), n = t.filter((l) => !s(this, a, p).call(this, l));
     return c`
       <umb-body-layout headline="Usage — ${e.name}">
         <div id="main">
@@ -65,9 +66,9 @@ class y extends R {
           </uui-box>
 
           <div class="summary-grid" aria-label="Usage summary">
-            ${r(this, a, m).call(this, "Total Usages", t.length, "icon-list")}
-            ${r(this, a, m).call(this, "Content Usages", i.length, "icon-document")}
-            ${r(this, a, m).call(this, "Configurational Usages", o.length, "icon-settings")}
+            ${s(this, a, m).call(this, "Total Usages", t.length, "icon-list")}
+            ${s(this, a, m).call(this, "Content Usages", i.length, "icon-document")}
+            ${s(this, a, m).call(this, "Configurational Usages", n.length, "icon-settings")}
           </div>
 
           ${t.length === 0 ? c`
@@ -78,31 +79,31 @@ class y extends R {
                 </uui-box>
               ` : c`
                 <div class="usage-content">
-                  ${r(this, a, f).call(this, "Content Usages", "icon-document", i)}
-                  ${r(this, a, f).call(this, "Configurational Usages", "icon-settings", o)}
+                  ${s(this, a, y).call(this, "Content Usages", "icon-document", i)}
+                  ${s(this, a, y).call(this, "Configurational Usages", "icon-settings", n)}
                 </div>
               `}
         </div>
 
         <umb-footer-layout slot="footer">
-          <uui-button slot="actions" label="Close" @click=${r(this, a, x)}>Close</uui-button>
+          <uui-button slot="actions" look="secondary" label="Close" @click=${s(this, a, $)}>Close</uui-button>
         </umb-footer-layout>
       </umb-body-layout>
     `;
   }
 }
-a = new WeakSet(), w = async function() {
+a = new WeakSet(), x = async function() {
   const e = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/i, t = window.location.href.match(e), i = t == null ? void 0 : t[0];
   if (!i) return;
-  let o = this._authContext;
-  o || (o = await new Promise((l) => {
-    const u = this.consumeContext(v, (g) => {
-      var _;
-      g && ((_ = u == null ? void 0 : u.destroy) == null || _.call(u), l(g));
+  let n = this._authContext;
+  n || (n = await new Promise((l) => {
+    const u = this.consumeContext(v, (b) => {
+      var g;
+      b && ((g = u == null ? void 0 : u.destroy) == null || g.call(u), l(b));
     });
   })), this._loadingFallback = !0;
   try {
-    const l = await o.getLatestToken(), u = await fetch(
+    const l = await n.getLatestToken(), u = await fetch(
       `/umbraco/backoffice/elementfinder/content-cleaner/candidate/${i}`,
       {
         credentials: "include",
@@ -117,12 +118,12 @@ a = new WeakSet(), w = async function() {
   } finally {
     this._loadingFallback = !1;
   }
-}, k = function(e) {
+}, w = function(e) {
   if (!e.key || !this._workspaceRouteBuilder) return;
   let t, i;
-  if (e.referenceType === "Content" || e.referenceType === "BlockList" || e.referenceType === "BlockGrid" ? (t = this._workspaceRouteBuilder({ entityType: N }), i = D.generateLocal({ unique: e.key })) : e.referenceType === "DataType" ? (t = this._workspaceRouteBuilder({ entityType: Y }), i = j.generateLocal({ unique: e.key })) : (t = this._workspaceRouteBuilder({ entityType: O }), i = L.generateLocal({ unique: e.key })), !(!t || !i))
+  if (e.referenceType === "Content" || e.referenceType === "BlockList" || e.referenceType === "BlockGrid" ? (t = this._workspaceRouteBuilder({ entityType: D }), i = L.generateLocal({ unique: e.key })) : e.referenceType === "DataType" ? (t = this._workspaceRouteBuilder({ entityType: H }), i = S.generateLocal({ unique: e.key })) : (t = this._workspaceRouteBuilder({ entityType: O }), i = Y.generateLocal({ unique: e.key })), !(!t || !i))
     return `${t}${i}`;
-}, C = function(e) {
+}, k = function(e) {
   switch (e.referenceType) {
     case "BlockList":
       return "Content - Block List";
@@ -139,7 +140,7 @@ a = new WeakSet(), w = async function() {
     default:
       return "Content";
   }
-}, $ = function(e) {
+}, C = function(e) {
   return e.propertyAlias && e.dataTypeName ? `${e.propertyAlias} - ${e.dataTypeName}` : e.propertyAlias ?? e.dataTypeName ?? e.contentTypeAlias ?? "-";
 }, p = function(e) {
   return e.referenceType === "Content" || e.referenceType === "BlockList" || e.referenceType === "BlockGrid";
@@ -155,7 +156,7 @@ a = new WeakSet(), w = async function() {
         </div>
       </uui-box>
     `;
-}, f = function(e, t, i) {
+}, y = function(e, t, i) {
   return i.length === 0 ? h : c`
       <uui-box class="usage-group">
         <div slot="headline" class="usage-group__headline">
@@ -169,22 +170,22 @@ a = new WeakSet(), w = async function() {
         <div class="table-wrap" role="region" aria-label="${e} table" tabindex="0">
           <uui-table>
             <uui-table-head>
-              <uui-table-head-cell>Name</uui-table-head-cell>
-              <uui-table-head-cell>Type</uui-table-head-cell>
-              <uui-table-head-cell>Reference</uui-table-head-cell>
-              <uui-table-head-cell class="action-cell">Action</uui-table-head-cell>
+              <uui-table-head-cell><span>Name</span></uui-table-head-cell>
+              <uui-table-head-cell><span>Type</span></uui-table-head-cell>
+              <uui-table-head-cell><span>Reference</span></uui-table-head-cell>
+              <uui-table-head-cell class="action-cell"><span>Action</span></uui-table-head-cell>
             </uui-table-head>
 
-            ${i.map((o) => {
-    const l = r(this, a, k).call(this, o), u = r(this, a, p).call(this, o) ? "Open" : "View";
+            ${i.map((n) => {
+    const l = s(this, a, w).call(this, n), u = s(this, a, p).call(this, n) ? "Open" : "View";
     return c`
                 <uui-table-row>
                   <uui-table-cell>
-                    <strong>${o.name}</strong>
-                    ${o.contentTypeAlias ? c`<div class="muted">${o.contentTypeAlias}</div>` : h}
+                    <strong>${n.name}</strong>
+                    ${n.contentTypeAlias ? c`<div class="muted">${n.contentTypeAlias}</div>` : h}
                   </uui-table-cell>
-                  <uui-table-cell>${r(this, a, C).call(this, o)}</uui-table-cell>
-                  <uui-table-cell>${r(this, a, $).call(this, o)}</uui-table-cell>
+                  <uui-table-cell>${s(this, a, k).call(this, n)}</uui-table-cell>
+                  <uui-table-cell>${s(this, a, C).call(this, n)}</uui-table-cell>
                   <uui-table-cell class="action-cell">
                     ${l ? c`
                           <uui-button
@@ -202,20 +203,56 @@ a = new WeakSet(), w = async function() {
         </div>
       </uui-box>
     `;
-}, x = function() {
+}, $ = function() {
   var e;
   (e = this._workspaceContext) == null || e.reject();
-}, d(y, "properties", {
+}, d(f, "properties", {
   _candidate: { state: !0 },
   _loadingFallback: { state: !0 }
-}), d(y, "styles", B`
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
+}), d(f, "styles", [
+  R,
+  E`
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+        color: var(--uui-color-text);
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif);
+        font-size: var(--uui-type-default-size, 14px);
+      }
 
-    #main {
+      uui-button {
+        font-size: var(--uui-type-default-size, 14px);
+        --uui-button-font-size: var(--uui-type-default-size, 14px);
+        font-family: inherit;
+      }
+
+      uui-table-head {
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        background-color: var(--uui-color-surface);
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell {
+        --uui-table-cell-padding: 10px 20px;
+        font-weight: 600 !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        color: var(--uui-color-text) !important;
+        box-sizing: border-box;
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell,
+      uui-table-head-cell span {
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif) !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        line-height: inherit;
+      }
+
+      #main {
       display: grid;
       gap: var(--uui-size-space-5);
       padding: var(--uui-size-layout-1);
@@ -234,7 +271,7 @@ a = new WeakSet(), w = async function() {
     }
 
     .type-tag {
-      --uui-tag-color: #000000;
+      --uui-tag-color: var(--uui-color-text);
       font-weight: 600;
     }
 
@@ -311,8 +348,9 @@ a = new WeakSet(), w = async function() {
       align-items: center;
       padding: var(--uui-size-layout-2);
     }
-  `);
-customElements.define("umb-content-cleaner-usage-workspace", y);
+  `
+]);
+customElements.define("umb-content-cleaner-usage-workspace", f);
 export {
-  y as default
+  f as default
 };

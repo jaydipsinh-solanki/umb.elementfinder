@@ -1,5 +1,6 @@
 import { css, html, nothing } from '@umbraco-cms/backoffice/external/lit';
 import { UmbLitElement } from '@umbraco-cms/backoffice/lit-element';
+import { UmbTextStyles } from '@umbraco-cms/backoffice/style';
 import { UMB_AUTH_CONTEXT } from '@umbraco-cms/backoffice/auth';
 import type { UmbAuthContext } from '@umbraco-cms/backoffice/auth';
 import { UMB_MODAL_CONTEXT } from '@umbraco-cms/backoffice/modal';
@@ -225,10 +226,10 @@ export default class ContentCleanerUsageWorkspaceElement extends UmbLitElement {
         <div class="table-wrap" role="region" aria-label="${title} table" tabindex="0">
           <uui-table>
             <uui-table-head>
-              <uui-table-head-cell>Name</uui-table-head-cell>
-              <uui-table-head-cell>Type</uui-table-head-cell>
-              <uui-table-head-cell>Reference</uui-table-head-cell>
-              <uui-table-head-cell class="action-cell">Action</uui-table-head-cell>
+              <uui-table-head-cell><span>Name</span></uui-table-head-cell>
+              <uui-table-head-cell><span>Type</span></uui-table-head-cell>
+              <uui-table-head-cell><span>Reference</span></uui-table-head-cell>
+              <uui-table-head-cell class="action-cell"><span>Action</span></uui-table-head-cell>
             </uui-table-head>
 
             ${usages.map((usage) => {
@@ -317,20 +318,56 @@ export default class ContentCleanerUsageWorkspaceElement extends UmbLitElement {
         </div>
 
         <umb-footer-layout slot="footer">
-          <uui-button slot="actions" label="Close" @click=${this.#close}>Close</uui-button>
+          <uui-button slot="actions" look="secondary" label="Close" @click=${this.#close}>Close</uui-button>
         </umb-footer-layout>
       </umb-body-layout>
     `;
   }
 
-  static styles = css`
-    :host {
-      display: block;
-      width: 100%;
-      height: 100%;
-    }
+  static styles = [
+    UmbTextStyles,
+    css`
+      :host {
+        display: block;
+        width: 100%;
+        height: 100%;
+        color: var(--uui-color-text);
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif);
+        font-size: var(--uui-type-default-size, 14px);
+      }
 
-    #main {
+      uui-button {
+        font-size: var(--uui-type-default-size, 14px);
+        --uui-button-font-size: var(--uui-type-default-size, 14px);
+        font-family: inherit;
+      }
+
+      uui-table-head {
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        background-color: var(--uui-color-surface);
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell {
+        --uui-table-cell-padding: 10px 20px;
+        font-weight: 600 !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        color: var(--uui-color-text) !important;
+        box-sizing: border-box;
+        border-bottom: 1px solid var(--uui-color-border);
+      }
+
+      uui-table-head-cell,
+      uui-table-head-cell span {
+        font-family: var(--uui-font-family, Lato, "Helvetica Neue", Helvetica, Arial, sans-serif) !important;
+        font-size: var(--uui-type-default-size, 14px) !important;
+        font-weight: 600 !important;
+        color: var(--uui-color-text) !important;
+        line-height: inherit;
+      }
+
+      #main {
       display: grid;
       gap: var(--uui-size-space-5);
       padding: var(--uui-size-layout-1);
@@ -426,7 +463,8 @@ export default class ContentCleanerUsageWorkspaceElement extends UmbLitElement {
       align-items: center;
       padding: var(--uui-size-layout-2);
     }
-  `;
+  `,
+  ];
 }
 
 customElements.define('umb-content-cleaner-usage-workspace', ContentCleanerUsageWorkspaceElement);

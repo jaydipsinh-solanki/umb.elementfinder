@@ -1,12 +1,12 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
 using Umb.ContentCleaner.Models;
 using Umb.ContentCleaner.Services;
 using Umbraco.Cms.Core;
-using Umbraco.Cms.Web.Common.Authorization;
-
 using Umbraco.Cms.Core.Services;
+using Umbraco.Cms.Web.Common.Authorization;
 
 namespace Umb.ContentCleaner;
 
@@ -21,15 +21,19 @@ public sealed class ContentCleanerApiController : ControllerBase
     private readonly IContentCleanerCacheService _cacheService;
     private readonly IContentTypeService _contentTypeService;
     private readonly IDataTypeService? _dataTypeService;
+    private readonly IBlockConfigurationCleanerService? _blockCleanerService;
 
+    [ActivatorUtilitiesConstructor]
     public ContentCleanerApiController(
         IContentCleanerCacheService cacheService,
-        IContentTypeService contentTypeService,
-        IDataTypeService? dataTypeService = null)
+        IContentTypeService contentTypeService = null!,
+        IDataTypeService? dataTypeService = null,
+        IBlockConfigurationCleanerService? blockCleanerService = null)
     {
         _cacheService = cacheService;
         _contentTypeService = contentTypeService;
         _dataTypeService = dataTypeService;
+        _blockCleanerService = blockCleanerService;
     }
 
     [HttpGet("scan")]
@@ -170,6 +174,17 @@ public sealed class ContentCleanerApiController : ControllerBase
             return BadRequest(new { message = "No items specified for deletion." });
         }
 
+        var contentKeys = request.Items
+            .Where(x => x.Type.Equals("Element Type", StringComparison.OrdinalIgnoreCase) ||
+                        x.Type.Equals("Document Type", StringComparison.OrdinalIgnoreCase))
+            .Select(x => x.Key)
+            .ToHashSet();
+
+        if (contentKeys.Count > 0 && _blockCleanerService is not null)
+        {
+            await _blockCleanerService.RemoveBlockReferencesAsync(contentKeys, cancellationToken);
+        }
+
         var deletedCount = 0;
         foreach (var item in request.Items)
         {
@@ -191,6 +206,11 @@ public sealed class ContentCleanerApiController : ControllerBase
 
 			if (contentType is not null && contentType.IsElement)
 			{
+				if (_blockCleanerService is not null)
+				{
+					await _blockCleanerService.RemoveBlockReferencesAsync(key);
+				}
+
 				_contentTypeService.Delete(contentType, -1);
 				return true;
 			}
@@ -201,6 +221,11 @@ public sealed class ContentCleanerApiController : ControllerBase
 
 			if (contentType is not null && !contentType.IsElement)
 			{
+				if (_blockCleanerService is not null)
+				{
+					await _blockCleanerService.RemoveBlockReferencesAsync(key);
+				}
+
 				_contentTypeService.Delete(contentType, -1);
 				return true;
 			}
