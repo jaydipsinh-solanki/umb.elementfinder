@@ -73,7 +73,14 @@ public sealed class ContentCleanerApiController : ControllerBase
 
         if (!string.IsNullOrWhiteSpace(type) && !type.Equals("all", StringComparison.OrdinalIgnoreCase))
         {
-            query = query.Where(x => x.Type.Equals(type, StringComparison.OrdinalIgnoreCase));
+            if (type.Equals("Element Type", StringComparison.OrdinalIgnoreCase))
+            {
+                query = query.Where(x => x.Type.Equals("Document Type", StringComparison.OrdinalIgnoreCase));
+            }
+            else
+            {
+                query = query.Where(x => x.Type.Equals(type, StringComparison.OrdinalIgnoreCase));
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(risk) &&
@@ -142,7 +149,9 @@ public sealed class ContentCleanerApiController : ControllerBase
         }
 
         var scan = await _cacheService.GetOrCreateAsync(cancellationToken);
-        var candidate = scan.Items.FirstOrDefault(x => x.Key == key && x.Type.Equals(type, StringComparison.OrdinalIgnoreCase));
+        var candidate = scan.Items.FirstOrDefault(x => x.Key == key && (
+            x.Type.Equals(type, StringComparison.OrdinalIgnoreCase) ||
+            (type.Equals("Element Type", StringComparison.OrdinalIgnoreCase) && x.Type.Equals("Document Type", StringComparison.OrdinalIgnoreCase))));
 
         if (candidate is null)
         {
@@ -200,26 +209,12 @@ public sealed class ContentCleanerApiController : ControllerBase
 
     private async Task<bool> DeleteItemAsync(Guid key, string type)
 	{
-		if (type.Equals("Element Type", StringComparison.OrdinalIgnoreCase))
+		if (type.Equals("Document Type", StringComparison.OrdinalIgnoreCase) ||
+		    type.Equals("Element Type", StringComparison.OrdinalIgnoreCase))
 		{
 			var contentType = _contentTypeService.Get(key);
 
-			if (contentType is not null && contentType.IsElement)
-			{
-				if (_blockCleanerService is not null)
-				{
-					await _blockCleanerService.RemoveBlockReferencesAsync(key);
-				}
-
-				_contentTypeService.Delete(contentType, -1);
-				return true;
-			}
-		}
-		else if (type.Equals("Document Type", StringComparison.OrdinalIgnoreCase))
-		{
-			var contentType = _contentTypeService.Get(key);
-
-			if (contentType is not null && !contentType.IsElement)
+			if (contentType is not null)
 			{
 				if (_blockCleanerService is not null)
 				{

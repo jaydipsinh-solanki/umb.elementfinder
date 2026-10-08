@@ -4,22 +4,22 @@ var T = (c) => {
 };
 var J = (c, u, e) => u in c ? G(c, u, { enumerable: !0, configurable: !0, writable: !0, value: e }) : c[u] = e;
 var p = (c, u, e) => J(c, typeof u != "symbol" ? u + "" : u, e), V = (c, u, e) => u.has(c) || T("Cannot " + e);
-var E = (c, u, e) => u.has(c) ? T("Cannot add the same private member more than once") : u instanceof WeakSet ? u.add(c) : u.set(c, e);
+var A = (c, u, e) => u.has(c) ? T("Cannot add the same private member more than once") : u instanceof WeakSet ? u.add(c) : u.set(c, e);
 var i = (c, u, e) => (V(c, u, "access private method"), e);
 import { html as r, nothing as h, css as X } from "@umbraco-cms/backoffice/external/lit";
 import { UmbLitElement as Y } from "@umbraco-cms/backoffice/lit-element";
 import { UmbTextStyles as Q } from "@umbraco-cms/backoffice/style";
 import { UMB_AUTH_CONTEXT as Z } from "@umbraco-cms/backoffice/auth";
-import { umbConfirmModal as A } from "@umbraco-cms/backoffice/modal";
+import { umbConfirmModal as R } from "@umbraco-cms/backoffice/modal";
 import { UMB_NOTIFICATION_CONTEXT as ee } from "@umbraco-cms/backoffice/notification";
 import { UmbModalRouteRegistrationController as te } from "@umbraco-cms/backoffice/router";
 import { UMB_WORKSPACE_MODAL as ae } from "@umbraco-cms/backoffice/workspace";
 const b = "/umbraco/backoffice/elementfinder/content-cleaner", ie = "content-cleaner-usage", se = 12e4;
-var t, k, R, x, w, y, f, U, D, L, K, B, C, M, z, P, I, N, j, H, W, q, _, v, ne, S, O;
+var t, k, E, x, w, y, f, U, D, L, K, B, C, M, z, P, I, N, j, H, W, q, _, v, ne, S, O;
 class $ extends Y {
   constructor() {
     super();
-    E(this, t);
+    A(this, t);
     p(this, "_authContext");
     p(this, "_notificationContext");
     p(this, "_initialLoadStarted", !1);
@@ -62,7 +62,7 @@ class $ extends Y {
           </p>
 
             <div class="toolbar">
-              <uui-button look="primary" label="Run scan" @click=${i(this, t, R)} ?disabled=${this._loading}>
+              <uui-button look="primary" label="Run scan" @click=${i(this, t, E)} ?disabled=${this._loading}>
                 Run scan
               </uui-button>
 
@@ -95,7 +95,6 @@ class $ extends Y {
                 .options=${[
       { name: "All types", value: "all", selected: this._type === "all" },
       { name: "Document Type", value: "Document Type", selected: this._type === "Document Type" },
-      { name: "Element Type", value: "Element Type", selected: this._type === "Element Type" },
       { name: "Property", value: "Property", selected: this._type === "Property" },
       { name: "Data Type", value: "Data Type", selected: this._type === "Data Type" }
     ]}
@@ -256,7 +255,7 @@ t = new WeakSet(), k = async function(e) {
   if (!o.ok)
     throw new Error(`Request failed (${o.status})`);
   return o.json();
-}, R = async function() {
+}, E = async function() {
   this._loading = !0, this._error = "";
   let e = !1;
   try {
@@ -356,7 +355,7 @@ t = new WeakSet(), k = async function(e) {
     return (((d = l.usages) == null ? void 0 : d.length) ?? l.usageCount) > 0;
   });
   try {
-    await A(this, {
+    await R(this, {
       headline: `Delete ${a} item${a === 1 ? "" : "s"}`,
       content: r`
           <p style="margin: 0 0 var(--uui-size-space-3, 12px);">Are you sure you want to delete the ${a} selected cleanup candidate${a === 1 ? "" : "s"}?</p>
@@ -404,7 +403,7 @@ t = new WeakSet(), k = async function(e) {
   var n, o, l;
   const a = (((n = e.usages) == null ? void 0 : n.length) ?? e.usageCount) > 0, s = e.usages && e.usages.length > 0 ? e.usages.length : e.usageCount;
   try {
-    await A(this, {
+    await R(this, {
       headline: `Delete ${e.type}`,
       content: r`
           <p style="margin: 0 0 var(--uui-size-space-3, 12px);">Are you sure you want to delete ${e.type.toLowerCase()} "${e.name}"?</p>

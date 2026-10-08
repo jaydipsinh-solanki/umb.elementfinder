@@ -130,9 +130,8 @@ a = new WeakSet(), x = async function() {
     case "BlockGrid":
       return "Content - Block Grid";
     case "DocumentType":
-      return "Document Type";
     case "ElementType":
-      return "Element Type";
+      return "Document Type";
     case "DataType":
       return "Data Type";
     case "Composition":

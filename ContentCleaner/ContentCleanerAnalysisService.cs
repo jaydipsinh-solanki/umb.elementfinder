@@ -286,11 +286,11 @@ public sealed class ContentCleanerAnalysisService : IContentCleanerAnalysisServi
             {
                 CleanupRisk.High => $"Used in {contentUsageCount} content item(s) through Block List/Grid or another serialized editor value.",
                 CleanupRisk.Review => "No saved block instances were found, but structural or Block editor configuration references exist.",
-                _ => "No saved Element Type instances, Block editor configuration references, or composition consumers were detected."
+                _ => "No saved Document Type instances, Block editor configuration references, or composition consumers were detected."
             };
 
             return Candidate(contentType.Key, ContentTypeName(contentType), contentType.Alias,
-                "Element Type", usageCount, risk, summary, usages);
+                "Document Type", usageCount, risk, summary, usages);
         }
 
         usageIndexes.ContentTypes.TryGetValue(contentType.Id, out var contentUsage);
@@ -324,7 +324,7 @@ public sealed class ContentCleanerAnalysisService : IContentCleanerAnalysisServi
         var definitionUsage = new UsageReference(
             contentType.Key,
             ContentTypeName(contentType),
-            contentType.IsElement ? UsageReferenceType.ElementType : UsageReferenceType.DocumentType,
+            UsageReferenceType.DocumentType,
             propertyType.Alias,
             dataType is null ? null : DataTypeName(dataType),
             dataType?.Key,
@@ -335,7 +335,7 @@ public sealed class ContentCleanerAnalysisService : IContentCleanerAnalysisServi
             var elementPropertyUsages = new[] { definitionUsage };
             return Candidate(propertyType.Key, propertyType.Name ?? propertyType.Alias, propertyType.Alias,
                 "Property", elementPropertyUsages.Length, CleanupRisk.Moderate,
-                "Property belongs to an Element Type. Its values are embedded in Block List/Grid data and are not counted independently in this version.",
+                "Property belongs to a Document Type. Its values are embedded in Block List/Grid data and are not counted independently in this version.",
                 elementPropertyUsages);
         }
 
@@ -367,7 +367,7 @@ public sealed class ContentCleanerAnalysisService : IContentCleanerAnalysisServi
             .Select(x => new UsageReference(
                 x.ContentType.Key,
                 ContentTypeName(x.ContentType),
-                x.ContentType.IsElement ? UsageReferenceType.ElementType : UsageReferenceType.DocumentType,
+                UsageReferenceType.DocumentType,
                 x.PropertyType.Alias,
                 DataTypeName(dataType),
                 dataType.Key,
