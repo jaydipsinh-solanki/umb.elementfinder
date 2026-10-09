@@ -195,7 +195,14 @@ public sealed class ContentCleanerApiController : ControllerBase
 
         if (contentKeys.Count > 0 && _blockCleanerService is not null)
         {
-            await _blockCleanerService.RemoveBlockReferencesAsync(contentKeys, cancellationToken);
+            try
+            {
+                await _blockCleanerService.RemoveBlockReferencesAsync(contentKeys, cancellationToken);
+            }
+            catch
+            {
+                // Non-fatal reference cleanup failure should not prevent deletion
+            }
         }
 
         var deletedCount = 0;
@@ -222,7 +229,14 @@ public sealed class ContentCleanerApiController : ControllerBase
 			{
 				if (_blockCleanerService is not null)
 				{
-					await _blockCleanerService.RemoveBlockReferencesAsync(key);
+					try
+					{
+						await _blockCleanerService.RemoveBlockReferencesAsync(key);
+					}
+					catch
+					{
+						// Non-fatal reference cleanup failure should not prevent deletion
+					}
 				}
 
 				_contentTypeService.Delete(contentType, -1);

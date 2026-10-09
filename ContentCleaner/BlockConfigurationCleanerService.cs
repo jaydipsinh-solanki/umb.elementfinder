@@ -96,7 +96,16 @@ public sealed class BlockConfigurationCleanerService : IBlockConfigurationCleane
         // 2. Clean saved block instances from Content property values
         if (_contentService is not null)
         {
-            updatedCount += CleanContentBlockReferences(elementOrContentTypeKeys, cancellationToken);
+            try
+            {
+                updatedCount += CleanContentBlockReferences(elementOrContentTypeKeys, cancellationToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(
+                    ex,
+                    "Failed to clean content block references after item deletion.");
+            }
         }
 
         return updatedCount;
@@ -118,64 +127,77 @@ public sealed class BlockConfigurationCleanerService : IBlockConfigurationCleane
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            var contentModified = false;
-
-            foreach (var property in content.Properties)
+            try
             {
-                foreach (var val in property.Values.ToArray())
+                var contentModified = false;
+
+                foreach (var property in content.Properties)
                 {
-                    var rawValue = val.EditedValue ?? val.PublishedValue;
-                    if (rawValue is null)
+                    foreach (var val in property.Values.ToArray())
                     {
-                        continue;
+                        var rawValue = val.EditedValue ?? val.PublishedValue;
+                        if (rawValue is null)
+                        {
+                            continue;
+                        }
+
+                        string? json = rawValue switch
+                        {
+                            string s => s,
+                            JsonElement je => je.GetRawText(),
+                            JsonNode jn => jn.ToJsonString(),
+                            _ => rawValue.ToString()
+                        };
+
+                        if (string.IsNullOrWhiteSpace(json) || !json.Contains("contentData", StringComparison.OrdinalIgnoreCase))
+                        {
+                            continue;
+                        }
+
+                        if (TryCleanContentBlockJson(json, elementOrContentTypeKeys, _contentTypeService, out var cleanedJson))
+                        {
+                            if (SetPropertyValueSafely(content, property, val.Culture, val.Segment, cleanedJson, _logger))
+                            {
+                                contentModified = true;
+                            }
+                        }
                     }
+                }
 
-                    string? json = rawValue switch
+                if (contentModified)
+                {
+                    try
                     {
-                        string s => s,
-                        JsonElement je => je.GetRawText(),
-                        JsonNode jn => jn.ToJsonString(),
-                        _ => rawValue.ToString()
-                    };
+                        _contentService.Save(content, -1);
 
-                    if (string.IsNullOrWhiteSpace(json) || !json.Contains("contentData", StringComparison.OrdinalIgnoreCase))
-                    {
-                        continue;
+                        if (IsContentPublished(content))
+                        {
+                            _contentService.Publish(content, ["*"], -1);
+                        }
+
+                        cleanedContentCount++;
+                        _logger.LogInformation(
+                            "Cleaned deleted block instances from content '{ContentName}' ({ContentKey}).",
+                            content.Name,
+                            content.Key);
                     }
-
-                    if (TryCleanContentBlockJson(json, elementOrContentTypeKeys, _contentTypeService, out var cleanedJson))
+                    catch (Exception ex)
                     {
-                        content.SetValue(property.Alias, cleanedJson, val.Culture, val.Segment);
-                        contentModified = true;
+                        _logger.LogWarning(
+                            ex,
+                            "Failed to save cleaned content '{ContentName}' ({ContentKey}) after block cleanup.",
+                            content.Name,
+                            content.Key);
                     }
                 }
             }
-
-            if (contentModified)
+            catch (Exception ex)
             {
-                try
-                {
-                    _contentService.Save(content, -1);
-
-                    if (IsContentPublished(content))
-                    {
-                        _contentService.Publish(content, ["*"], -1);
-                    }
-
-                    cleanedContentCount++;
-                    _logger.LogInformation(
-                        "Cleaned deleted block instances from content '{ContentName}' ({ContentKey}).",
-                        content.Name,
-                        content.Key);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(
-                        ex,
-                        "Failed to save cleaned content '{ContentName}' ({ContentKey}) after block cleanup.",
-                        content.Name,
-                        content.Key);
-                }
+                _logger.LogWarning(
+                    ex,
+                    "Failed to process content '{ContentName}' ({ContentKey}) for block cleanup.",
+                    content.Name,
+                    content.Key);
             }
         }
 
@@ -273,6 +295,122 @@ public sealed class BlockConfigurationCleanerService : IBlockConfigurationCleane
         catch
         {
             // Ignore and fall through
+        }
+
+        return false;
+    }
+
+    private static bool SetPropertyValueSafely(
+        IContent content,
+        IProperty property,
+        string? culture,
+        string? segment,
+        object? value,
+        ILogger logger)
+    {
+        var targetCulture = culture;
+        var targetSegment = segment;
+
+        if (!PropertyVariesByCulture(property))
+        {
+            targetCulture = null;
+        }
+
+        if (!PropertyVariesBySegment(property))
+        {
+            targetSegment = null;
+        }
+
+        try
+        {
+            content.SetValue(property.Alias, value, targetCulture, targetSegment);
+            return true;
+        }
+        catch (NotSupportedException)
+        {
+            // If the variation was rejected (e.g. legacy/orphaned variation data),
+            // fallback to invariant SetValue
+            try
+            {
+                content.SetValue(property.Alias, value);
+                return true;
+            }
+            catch (Exception ex)
+            {
+                logger.LogWarning(
+                    ex,
+                    "Failed to set value for property '{PropertyAlias}' on content '{ContentName}' ({ContentKey}) with culture '{Culture}' and segment '{Segment}'.",
+                    property.Alias,
+                    content.Name,
+                    content.Key,
+                    culture,
+                    segment);
+                return false;
+            }
+        }
+        catch (Exception ex)
+        {
+            logger.LogWarning(
+                ex,
+                "Failed to set value for property '{PropertyAlias}' on content '{ContentName}' ({ContentKey}).",
+                property.Alias,
+                content.Name,
+                content.Key);
+            return false;
+        }
+    }
+
+    private static bool PropertyVariesByCulture(IProperty property)
+    {
+        try
+        {
+            if (property.PropertyType is not null)
+            {
+                return property.PropertyType.VariesByCulture();
+            }
+        }
+        catch
+        {
+            try
+            {
+                var variations = property.PropertyType?.Variations;
+                if (variations.HasValue)
+                {
+                    return ((int)variations.Value & (int)ContentVariation.Culture) > 0;
+                }
+            }
+            catch
+            {
+                // Ignore
+            }
+        }
+
+        return false;
+    }
+
+    private static bool PropertyVariesBySegment(IProperty property)
+    {
+        try
+        {
+            if (property.PropertyType is not null)
+            {
+                return property.PropertyType.VariesBySegment();
+            }
+        }
+        catch
+        {
+            try
+            {
+                var variations = property.PropertyType?.Variations;
+                if (variations.HasValue)
+                {
+                    return ((int)variations.Value & (int)ContentVariation.Segment) > 0;
+                }
+            }
+            catch
+            {
+                // Ignore
+            }
         }
 
         return false;
