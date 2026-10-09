@@ -143,4 +143,82 @@ public class BlockConfigurationCleanerServiceTests
 
         Assert.False(changed);
     }
+
+    [Fact]
+    public void TryCleanContentBlockJson_RemovesMatchingBlockFromContentDataExposeAndLayout()
+    {
+        var deletedTypeKey = Guid.NewGuid();
+        var remainingTypeKey = Guid.NewGuid();
+        var deletedBlockKey = Guid.NewGuid();
+        var remainingBlockKey = Guid.NewGuid();
+
+        var json = $@"[
+            {{
+                ""contentData"": [
+                    {{
+                        ""contentTypeKey"": ""{deletedTypeKey}"",
+                        ""key"": ""{deletedBlockKey}"",
+                        ""values"": []
+                    }},
+                    {{
+                        ""contentTypeKey"": ""{remainingTypeKey}"",
+                        ""key"": ""{remainingBlockKey}"",
+                        ""values"": []
+                    }}
+                ],
+                ""settingsData"": [],
+                ""expose"": [
+                    {{ ""contentKey"": ""{deletedBlockKey}"", ""culture"": null, ""segment"": null }},
+                    {{ ""contentKey"": ""{remainingBlockKey}"", ""culture"": null, ""segment"": null }}
+                ],
+                ""layout"": {{
+                    ""Umbraco.BlockGrid"": [
+                        {{
+                            ""columnSpan"": 12,
+                            ""rowSpan"": 1,
+                            ""areas"": [],
+                            ""contentKey"": ""{deletedBlockKey}""
+                        }},
+                        {{
+                            ""columnSpan"": 12,
+                            ""rowSpan"": 1,
+                            ""areas"": [],
+                            ""contentKey"": ""{remainingBlockKey}""
+                        }}
+                    ]
+                }}
+            }}
+        ]".Trim().TrimStart('[').TrimEnd(']');
+
+        var changed = BlockConfigurationCleanerService.TryCleanContentBlockJson(
+            json,
+            new HashSet<Guid> { deletedTypeKey },
+            null,
+            out var cleanedJson);
+
+        Assert.True(changed);
+
+        using var doc = JsonDocument.Parse(cleanedJson);
+        var root = doc.RootElement;
+
+        var contentData = root.GetProperty("contentData").EnumerateArray().ToArray();
+        Assert.Single(contentData);
+        Assert.Equal(remainingBlockKey.ToString(), contentData[0].GetProperty("key").GetString());
+
+        var expose = root.GetProperty("expose").EnumerateArray().ToArray();
+        Assert.Single(expose);
+        Assert.Equal(remainingBlockKey.ToString(), expose[0].GetProperty("contentKey").GetString());
+
+        var layout = root.GetProperty("layout").GetProperty("Umbraco.BlockGrid").EnumerateArray().ToArray();
+        Assert.Single(layout);
+        Assert.Equal(remainingBlockKey.ToString(), layout[0].GetProperty("contentKey").GetString());
+    }
+
+    [Fact]
+    public async Task RemoveBlockReferencesAsync_WithEmptyKeys_ReturnsZeroImmediately()
+    {
+        var service = new BlockConfigurationCleanerService(null!, null!);
+        var result = await service.RemoveBlockReferencesAsync(new HashSet<Guid>());
+        Assert.Equal(0, result);
+    }
 }

@@ -174,8 +174,8 @@ export default class ContentCleanerUsageWorkspaceElement extends UmbLitElement {
     switch (usage.referenceType) {
       case 'BlockList': return 'Content - Block List';
       case 'BlockGrid': return 'Content - Block Grid';
-      case 'DocumentType': return 'Document Type';
-      case 'ElementType': return 'Element Type';
+      case 'DocumentType':
+      case 'ElementType': return 'Document Type';
       case 'DataType': return 'Data Type';
       case 'Composition': return 'Composition';
       default: return 'Content';

@@ -39,12 +39,16 @@ public sealed class ContentCleanerApiController : ControllerBase
     [HttpGet("scan")]
     [ProducesResponseType(typeof(CleanerScanResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<CleanerScanResponse>> Scan(CancellationToken cancellationToken)
-        => Ok(await _cacheService.RefreshAsync(cancellationToken));
+    {
+        return Ok(await _cacheService.RefreshAsync(cancellationToken));
+    }
 
     [HttpGet("snapshot")]
     [ProducesResponseType(typeof(CleanerScanResponse), StatusCodes.Status200OK)]
     public async Task<ActionResult<CleanerScanResponse>> Snapshot(CancellationToken cancellationToken)
-        => Ok(await _cacheService.GetOrCreateAsync(cancellationToken));
+    {
+        return Ok(await _cacheService.GetOrCreateAsync(cancellationToken));
+    }
 
     [HttpGet("candidates")]
     [ProducesResponseType(typeof(CleanerPagedResponse<CleanupCandidate>), StatusCodes.Status200OK)]

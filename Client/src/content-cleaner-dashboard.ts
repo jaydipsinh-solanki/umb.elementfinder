@@ -555,9 +555,18 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
     `;
   }
 
-  #renderSummaryCard(label: string, value: number, icon: string) {
+  #renderSummaryCard(label: string, value: number, icon: string, riskValue: string) {
+    const isSelected = this._risk === riskValue;
+
     return html`
-      <uui-box class="summary-card">
+      <uui-box
+        class="summary-card ${isSelected ? 'summary-card--selected' : ''}"
+        role="button"
+        tabindex="0"
+        aria-pressed=${isSelected}
+        aria-label="Filter by ${label}"
+        @click=${() => this.#onCardClick(riskValue)}
+        @keydown=${(e: KeyboardEvent) => this.#onCardKeydown(e, riskValue)}>
         <div class="summary-card__content">
           <uui-icon name=${icon}></uui-icon>
           <div>
@@ -567,6 +576,18 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
         </div>
       </uui-box>
     `;
+  }
+
+  #onCardClick(riskValue: string): void {
+    this._risk = riskValue;
+    this.#applyFilters();
+  }
+
+  #onCardKeydown(event: KeyboardEvent, riskValue: string): void {
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.#onCardClick(riskValue);
+    }
   }
 
   #renderSortHeading(label: string, column: SortColumn) {
@@ -647,11 +668,11 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
           ${this._summary
             ? html`
                 <div class="summary-grid">
-                  ${this.#renderSummaryCard('Total analyzed', this._summary.totalItems, 'icon-search')}
-                  ${this.#renderSummaryCard('Low risk', this._summary.lowRisk, 'icon-check')}
-                  ${this.#renderSummaryCard('Moderate', this._summary.moderate, 'icon-shield')}
-                  ${this.#renderSummaryCard('Review', this._summary.review, 'icon-alert')}
-                  ${this.#renderSummaryCard('High risk', this._summary.highRisk, 'icon-stop-alt')}
+                  ${this.#renderSummaryCard('Total analyzed', this._summary.totalItems, 'icon-search', 'all')}
+                  ${this.#renderSummaryCard('Low risk', this._summary.lowRisk, 'icon-check', 'Low')}
+                  ${this.#renderSummaryCard('Moderate', this._summary.moderate, 'icon-shield', 'Moderate')}
+                  ${this.#renderSummaryCard('Review', this._summary.review, 'icon-alert', 'Review')}
+                  ${this.#renderSummaryCard('High risk', this._summary.highRisk, 'icon-stop-alt', 'High')}
                 </div>
               `
             : nothing}
@@ -668,10 +689,10 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
 
               <uui-select
                 label="Type"
+                .value=${this._type}
                 .options=${[
                   { name: 'All types', value: 'all', selected: this._type === 'all' },
                   { name: 'Document Type', value: 'Document Type', selected: this._type === 'Document Type' },
-                  { name: 'Element Type', value: 'Element Type', selected: this._type === 'Element Type' },
                   { name: 'Property', value: 'Property', selected: this._type === 'Property' },
                   { name: 'Data Type', value: 'Data Type', selected: this._type === 'Data Type' },
                 ]}
@@ -680,6 +701,7 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
 
               <uui-select
                 label="Risk"
+                .value=${this._risk}
                 .options=${[
                   { name: 'All risks', value: 'all', selected: this._risk === 'all' },
                   { name: 'Low', value: 'Low', selected: this._risk === 'Low' },
@@ -899,6 +921,31 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
       gap: var(--uui-size-space-4);
+    }
+
+    .summary-card {
+      cursor: pointer;
+      user-select: none;
+      transition: transform 120ms ease, box-shadow 120ms ease, border-color 120ms ease;
+      border: 2px solid transparent;
+      border-radius: var(--uui-border-radius, 4px);
+      outline: none;
+    }
+
+    .summary-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      border-color: var(--uui-color-border-emphasis, #c5c5c5);
+    }
+
+    .summary-card:focus-visible {
+      box-shadow: 0 0 0 2px var(--uui-color-selected, #3544b1);
+      border-color: var(--uui-color-selected, #3544b1);
+    }
+
+    .summary-card--selected {
+      border-color: var(--uui-color-selected, #3544b1);
+      box-shadow: 0 2px 8px rgba(53, 68, 177, 0.18);
     }
 
     .summary-card__content {
