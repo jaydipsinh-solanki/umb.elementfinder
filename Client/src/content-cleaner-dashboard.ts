@@ -618,18 +618,6 @@ export default class UmbContentCleanerDashboardElement extends UmbLitElement {
     `;
   }
 
-  #usageSummary(item: CleanupCandidate): string {
-    const contentCount = item.usages.filter((usage) =>
-      usage.referenceType === 'Content' || usage.referenceType === 'BlockList' || usage.referenceType === 'BlockGrid').length;
-    const configurationCount = item.usages.length - contentCount;
-    const parts: string[] = [];
-
-    if (contentCount > 0) parts.push(`${contentCount} content usage${contentCount === 1 ? '' : 's'}`);
-    if (configurationCount > 0) parts.push(`${configurationCount} configuration usage${configurationCount === 1 ? '' : 's'}`);
-
-    return parts.join(' / ');
-  }
-
   #usageWorkspaceHref(item: CleanupCandidate): string | undefined {
     if (!item.key || !this._usageWorkspacePathBuilder) return undefined;
     return this._usageWorkspacePathBuilder({ candidateKey: item.key });
