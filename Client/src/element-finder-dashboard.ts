@@ -463,8 +463,6 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
     const elementTypeAlias = selected?.alias ?? "";
     const contentKey = page.key;
 
-    console.log(`[ElementFinder] Starting scroll watcher for page: "${page.name}" (${contentKey}), element: "${elementTypeName}" (${elementTypeAlias})`);
-
     // Clean up any ongoing scroll watcher
     this._scrollCleanup?.();
     let cancelled = false;
@@ -487,7 +485,6 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
         );
         if (res.ok) {
           propertyAliases = ((await res.json()) as string[]) ?? [];
-          console.log(`[ElementFinder] Matching property aliases for element:`, propertyAliases);
         }
       } catch (err) {
         console.warn(`[ElementFinder] Could not fetch property aliases:`, err);
@@ -532,11 +529,9 @@ class ElementFinderDashboardElement extends UmbElementMixin(LitElement) {
 
         if (target && target.getBoundingClientRect().height > 0) {
           if (isExact) {
-            console.log(`[ElementFinder] Found exact target element in workspace:`, target);
             this._scrollAndHighlight(target, workspaceModal);
             return;
           } else if (!scrolledOnce) {
-            console.log(`[ElementFinder] Scrolled towards property container, awaiting block items:`, target);
             scrolledOnce = true;
             this._scrollToTarget(target, workspaceModal);
           }

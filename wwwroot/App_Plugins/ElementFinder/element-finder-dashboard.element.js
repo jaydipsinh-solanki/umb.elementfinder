@@ -100,7 +100,7 @@ class x extends O($) {
     var b;
     this._activeGoToPageItem = t;
     const a = this._selectedElementType, i = (a == null ? void 0 : a.name) ?? "", r = (a == null ? void 0 : a.alias) ?? "", n = t.key;
-    console.log(`[ElementFinder] Starting scroll watcher for page: "${t.name}" (${n}), element: "${i}" (${r})`), (b = this._scrollCleanup) == null || b.call(this);
+    (b = this._scrollCleanup) == null || b.call(this);
     let s = !1;
     this._scrollCleanup = () => {
       s = !0;
@@ -115,7 +115,7 @@ class x extends O($) {
           `${v}/propertyaliasesforelement?contentKey=${n}&elementTypeAlias=${encodeURIComponent(r)}`,
           { headers: m, credentials: "include" }
         );
-        h.ok && (o = await h.json() ?? [], console.log("[ElementFinder] Matching property aliases for element:", o));
+        h.ok && (o = await h.json() ?? []);
       } catch (e) {
         console.warn("[ElementFinder] Could not fetch property aliases:", e);
       }
@@ -144,9 +144,9 @@ class x extends O($) {
         const { target: h, isExact: w } = m;
         if (h && h.getBoundingClientRect().height > 0)
           if (w) {
-            console.log("[ElementFinder] Found exact target element in workspace:", h), this._scrollAndHighlight(h, f);
+            this._scrollAndHighlight(h, f);
             return;
-          } else u || (console.log("[ElementFinder] Scrolled towards property container, awaiting block items:", h), u = !0, this._scrollToTarget(h, f));
+          } else u || (u = !0, this._scrollToTarget(h, f));
       }
       setTimeout(p, c);
     };
